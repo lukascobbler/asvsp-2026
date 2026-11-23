@@ -1,0 +1,173 @@
+
+---
+title: "Eventify<sup>™️</sup> - United States weather events analyisis and reporting"
+author: "Luka Bursać"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    transition: fade
+    scrollable: true
+    width: 1920
+    height: 1080
+    css: styles.css
+---
+
+# Project domain and motivation
+
+## Project domain
+
+- Severe weather events occur continuously across the United States, varying in type, intensity, duration and geographical impact.
+- Recording these events and their characteristics over time enables the analysis of weather patterns, geographical risks and the impact of severe conditions.
+
+## Project motivation
+
+- The Eventify<sup>™️</sup> project aims to provide a deeper understanding of historical and currently occurring weather events.
+- It provides advanced analytics using Big Data processing technologies.
+- Combining historical event records with real-time weather alerts enables the identification of recurring hazards, changing risk patterns and potentially vulnerable geographical areas.
+
+# Project stakeholders
+
+## The scenario
+
+- The weather department of the US government has hired the data architects of our company to provide a data solution that meets the different needs of its employees.
+- The department is represented by three people:
+	- **Michael Carter – Director of Weather Risk Management**
+	- **Sarah Mitchell – Chief Operating Officer (COO)**
+	- **James Wilson – Chief Technology Officer (CTO)**
+
+## The requirements {.smaller}
+
+{{< include ./include/requirements_table.html >}}
+
+# Project Dataset
+
+## Dataset overview
+
+- **Batch dataset:** Historical severe weather event records published by the "National Centers for Environmental Information" (NCEI), a NOAA institution.
+- **Streaming dataset:** Active weather alerts published by the National Weather Service (NWS), part of NOAA.
+- **Geographical reference data:** State, county and forecast-zone identifiers are used to establish geographical relationships between the datasets.
+
+## Batch dataset
+
+| Table | Table description |
+|---|---|
+| `StormEvents_details` | Details of individual weather events, including event type, duration, magnitude, damage and casualties. Events can be grouped into broader episodes. |
+| `StormEvents_fatalities` | Individual fatality records associated with weather events, including location and fatality characteristics. |
+| `StormEvents_locations` | Additional geographical location records associated with individual events. |
+
+- The dataset contains historical records beginning in 1950, with the latest available reporting years depending on the published files.
+- [Dataset source](https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/)
+
+## Event details
+
+- **General field description:**
+	- Event identification: `EVENT_ID`, `EPISODE_ID`, `EVENT_TYPE`.
+	- Temporal information: `BEGIN_DATE_TIME`, `END_DATE_TIME`, `CZ_TIMEZONE`.
+	- Geographical information: `STATE`, `STATE_FIPS`, `CZ_NAME`, `CZ_FIPS`, `CZ_TYPE`, `BEGIN_LAT`, `BEGIN_LON`, `END_LAT`, `END_LON`.
+	- Impact information: `INJURIES_DIRECT`, `DEATHS_DIRECT`, `DAMAGE_PROPERTY`, `DAMAGE_CROPS`.
+	- Event-specific characteristics: `TOR_F_SCALE`, `MAGNITUDE`, `MAGNITUDE_TYPE` and other fields.
+- **Role:** Main source of information about individual weather events and their impacts.
+- **Why it matters:** Enables historical analysis of event frequency, duration, severity, casualties, damage and geographical distribution.
+
+## Event fatalities
+
+- **General field description:**
+	- `EVENT_ID` — identifies the associated weather event.
+	- `FATALITY_TYPE` — describes the type of fatality.
+	- `FATALITY_DATE` — date of the fatality.
+	- Geographical information and other fatality-specific attributes.
+- **Role:** Provides individual fatality records associated with weather events.
+- **Why it matters:** Enables more detailed casualty analysis.
+
+## Event locations
+
+- **General field description:**
+	- `EVENT_ID` — identifies the associated event.
+	- `LOCATION_INDEX` — identifies a location record within an event.
+	- `LATITUDE`, `LONGITUDE` — geographical coordinates.
+	- Additional location information, where available.
+- **Role:** Provides multiple geographical location records for individual weather events.
+- **Why it matters:** Enables more detailed geographical analysis.
+
+# Real-time event streaming dataset
+
+## NOAA event API
+
+- **Role:** Provides currently active weather alerts issued by the National Weather Service.
+- The API is periodically queried to retrieve new alerts, updated alerts and alerts that are no longer active.
+- **General JSON structure:**
+	- `id`, `event`, `status`, `messageType`.
+	- `severity`, `urgency`, `certainty`.
+	- `effective`, `onset`, `expires`, `ends`.
+	- `areaDesc` — geographical area description.
+- Alert event classifications are provided by NOAA/NWS and do not map perfectly to the historical Storm Events event types. Matching is done within the application.
+- [Dataset source API](https://api.weather.gov/alerts/active)
+- [Available alert event types](https://api.weather.gov/alerts/types)
+
+## Example streaming record {.smaller}
+
+- A simplified example of an active weather alert:
+```json
+{
+	"id": "urn:oid:2.49.0.1.840.0-KEEPALIVE-30439",
+	"areaDesc": "Montgomery",
+	"geocode": { ... },
+	"affectedZones": [ "https://api.weather.gov/zones/county/MDC031" ],
+	"sent": "2026-11-23T17:34:55+00:00",
+	"effective": "2026-11-23T17:34:55+00:00",
+	"expires": "2026-11-23T17:44:55+00:00",
+	"status": "Test",
+	"messageType": "Alert",
+	"category": "Met",
+	"severity": "Unknown",
+	"urgency": "Unknown",
+	"event": "Test Message",
+	"description": "Monitoring message only. Please disregard.",
+	"note": "This is only a test for monitoring of vital dissemination systems.",
+}
+```
+
+- Illustrative example that does not contain all fields.
+- Each API response can contain multiple alert records.
+- The same alert can appear in consecutive API responses while it remains active.
+- Alert updates, cancellations and expirations must be distinguished from newly issued alerts.
+
+# Analytics questions
+
+## Batch dataset questions {.smaller}
+
+- **Simple complexity**
+    1. Which event types have the highest injury and fatality rates?
+    2. Which counties experience the greatest diversity of severe weather events?
+    3. Which event types have the longest average duration?
+    4. Which event type is the most common?
+    5. Which event type is the most common for the selected county?
+
+- **Medium complexity**
+    6. Which counties have experienced the largest increases in severe weather events over consecutive years?
+    7. Which event types cause the greatest property damage relative to their frequency?
+    8. How do tornado intensity categories relate to property damage and casualties?
+    9. Which states have experienced the greatest changes in their dominant weather hazards over consecutive six-month periods?
+    10. Which event types cause disproportionately high crop damage compared with property damage?
+    11. Which states have experienced the longest-lasting weather episodes?
+
+- **High complexity**
+    12. How do weather-related damages vary by season and time of day?
+    13. Which counties experience the shortest intervals between consecutive occurrences of the same weather event type?
+    14. For which weather event types does property damage vary most significantly between states?
+    15. Which states experience the most concentrated seasonal risk?
+
+## Stream dataset questions
+
+- **Stream analytics**
+	1. Which counties currently have the greatest number of active weather alerts?
+	2. Which hazards are currently most widespread across the United States?
+	3. Which counties have experienced the largest increase in alert activity over the last 30 minutes?
+
+- **Stream-table joins**
+	4. Are active alerts occurring in counties where historically recorded weather events have caused the most fatalities?
+
+- **Complex Event Processing (CEP)**
+	5. Which counties have simultaneous tornado and severe thunderstorm warnings?
+	6. Which counties experience consecutive alert updates indicating escalating weather severity?

@@ -1,0 +1,160 @@
+<!-- 
+When interpreted by an LLM:
+- HINT annotations should give you the driving force for some of the decisions of a particular stakeholder
+- If HINT annotations go into technical detail, the stakeholder's output mustn't because they aren't technical people in the sense of them being developers
+- The Director of weather risk management's role is to generally uphold large data and the batch queries
+- The COO's role is to generally support real-time analytical data
+- The CTO's role is to make the project technically feasible for the government, not to ask about detailed technical specifics (such as technology used)
+- The third column of the big table describes what the stakeholder should be worried when the ADS is simulated
+- Technologies that must be used are (this is just to drive the ADS, and should not be mentioned by the stakeholders):
+  - HDFS for storage
+  - Spark structured streaming for stream processing
+  - Kafka as a message broker
+  - Spark as a batch processor
+-->
+
+<div class="eventify-requirements">
+  <style>
+    .eventify-requirements {
+      font-family: inherit;
+      color: inherit;
+      font-size: 0.8em;
+      line-height: 1.25;
+      width: 100%;
+    }
+
+    .eventify-requirements table {
+      width: 100%;
+      border-collapse: collapse;
+      border-spacing: 0;
+      font: inherit;
+      color: inherit;
+      table-layout: fixed;
+      border: 1px solid var(--quarto-border-color, currentColor);
+    }
+    
+    .eventify-requirements tr {
+      border: 1px solid var(--quarto-border-color, currentColor);
+    }
+
+    .eventify-requirements th,
+    .eventify-requirements td {
+      padding: 0.45em 0.55em;
+      border: 1px solid var(--quarto-border-color, currentColor);
+      vertical-align: top;
+      text-align: left;
+      overflow-wrap: anywhere;
+    }
+
+    .eventify-requirements th {
+      font-weight: 700;
+    }
+
+    .eventify-requirements ul {
+      margin: 0;
+      padding-left: 1.1em;
+    }
+
+    .eventify-requirements li {
+      margin: 0 0 0.15em;
+    }
+
+    .eventify-requirements li:last-child {
+      margin-bottom: 0;
+    }
+  </style>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Person and role</th>
+        <th>Expectations</th>
+        <th>Technical business requirements</th>
+        <th>Architectural demands during ADS</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Michael Carter – Director of Weather Risk Management</strong></td>
+        <td>
+          <ul>
+            <li><b>Understanding of weather-related risks for general public safety.</b></li>
+            <li>Understand historical weather patterns.</li>
+            <li>Identify geographically vulnerable areas.</li>
+            <li>Evaluate the impact of different hazards.</li>
+            <li>Monitor current weather threats.</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Historical analysis of event frequency, severity, casualties and property damage.</li>
+            <li>Geographical risk comparisons.</li>
+            <li>Identification of recurring hazards.</li>
+            <li>Determine how historical and real-time information should be combined.</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Clarify required analytical depth, geographical granularity and historical data coverage.</li>
+            <li>Establish how results should be presented for risk assessment.</li>
+            <li>Advanced analytics for the IT department.</li> <!-- HINT: Requires a star schema gold layer -->
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Sarah Mitchell – Chief Operating Officer (COO)</strong></td>
+        <td>
+          <ul>
+            <li><b>The government weather institution efficiency.</b></li>
+            <li>Obtain a clear overview of weather-related risks.</li>
+            <li>Support day-to-day decisions and resource prioritization in the weather government institution.</li>
+            <li>Understand changing conditions across geographical areas.</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Concise dashboards and reports.</li>
+            <li>Key indicators for active alerts and historical impacts.</li>
+            <li>Comparisons between states and counties.</li>
+            <li>Identification of significant increases in weather activity.</li>
+            <li>Accessible and timely analytical results.</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Clarify reporting needs and expected response times.</li>
+            <li>Define availability expectations.</li> <!-- HINT: Requires high availability, thus requiring a highly available HDFS implementation -->
+            <li>Identify which analyses need to be immediately available and which can be generated periodically.</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>James Wilson – Chief Technology Officer (CTO)</strong></td>
+        <td>
+          <ul>
+            <li><b>Technical feasibility of the solution.</b></li>
+            <li>Ensure reliability, scalability and security.</li>
+            <li>Support long-term maintainability and future analytical requirements.</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Integration of NOAA data sources.</li>
+            <li>Reliable ingestion and processing of batch and streaming data.</li>
+            <li>Data quality and consistency.</li>
+            <li>Support for future changes and extensions.</li>
+            <li>The solution should be based on modern technologies.</li> <!-- HINT: Requires a data lakehouse implementation (Apache Iceberg) -->
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Investigate scalability, performance and reliability.</li>
+            <li>Define security and data governance requirements.</li>
+            <li>Identify technology constraints and interoperability needs.</li>
+            <li>Evaluate suitable technologies and deployment options.</li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
